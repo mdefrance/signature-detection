@@ -18,6 +18,9 @@ flake8-pyproject = "^1.2.3"
 pylint = "^3.3.5"
 isort = "^6.0.1"
 transformers = "^4.52.4"
+datasets = "^3.6.0"
+accelerate = "^1.8.1"
+pytorch-lightning = "^2.5.2"
 
 
 [tool.black]
