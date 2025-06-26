@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "signature-detection"
+version = "0.1.0"
+description = "Signature detection YOLOS model"
+authors = ["Mario DEFRANCE <defrancemario@gmail.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+ipykernel = "^6.29.5"
+ipywidgets = "^8.1.5"
+optuna = "^4.2.1"
+black = "^25.1.0"
+flake8 = "^7.1.2"
+flake8-pyproject = "^1.2.3"
+pylint = "^3.3.5"
+isort = "^6.0.1"
+transformers = "^4.52.4"
+
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "E704"]
+
+[tool.pylint.messages_control]
+disable = ["C0301", "C0103", "E0110", "W0621", "import-error"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
