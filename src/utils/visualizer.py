@@ -54,7 +54,7 @@ def visualize_item(item):
     return add_label_bbox(item[1]["boxes"], image)
 
 
-def visualize_prediction(image, predictions):
+def _visualize_pred(image, predictions):
     """
     Display an image with bounding boxes drawn from the predictions.
 
@@ -67,13 +67,13 @@ def visualize_prediction(image, predictions):
 
     # Draw each bounding box
     for prediction in predictions:
-        box = prediction['box']
-        xmin = box['xmin']
-        ymin = box['ymin']
-        xmax = box['xmax']
-        ymax = box['ymax']
-        label = prediction['label']
-        score = prediction['score']
+        box = prediction["box"]
+        xmin = box["xmin"]
+        ymin = box["ymin"]
+        xmax = box["xmax"]
+        ymax = box["ymax"]
+        label = prediction["label"]
+        score = prediction["score"]
 
         # Draw the bounding box
         draw.rectangle([xmin, ymin, xmax, ymax], outline="blue", width=2)
@@ -83,3 +83,23 @@ def visualize_prediction(image, predictions):
         draw.text((xmin, ymin), label_text, fill="blue")
 
     return image
+
+
+def visualize_prediction(item, prediction):
+    """Visualize predictions alongside the expected item."""
+
+    # getting expected and predicted images
+    expected_image = visualize_item(item)
+    predicted_image = _visualize_pred(convert_tensor_to_pil_image(item[0]), prediction)
+
+    # Create a new image with combined width
+    combined = Image.new(
+        "RGB",
+        (
+            expected_image.width + predicted_image.width,
+            max(expected_image.height, predicted_image.height),
+        ),
+    )
+    combined.paste(expected_image, (0, 0))
+    combined.paste(predicted_image, (expected_image.width, 0))
+    return combined

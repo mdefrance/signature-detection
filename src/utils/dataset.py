@@ -1,122 +1,100 @@
-from torch.utils.data import Dataset
-from pycocotools.coco import COCO
+"""Utility functions for converting datasets to COCO format and defining a custom dataset class
+for signature detection.
+"""
+
+import torchvision
 
 
-class SignatureDataset(Dataset):
-    """Custom dataset class for signature detection."""
+import os
+import json
+from tqdm import tqdm
+from .config import TARGET
 
-    def __init__(self, dataset, processor):
-        """Initialize the SignatureDataset."""
-        self.dataset = dataset
-        self.processor = processor
 
-        # Construct COCO-style dict
-        self.coco_dict = self.build_coco_dict()
-        self.coco = COCO()
-        self.coco.dataset = self.coco_dict
-        self.coco.createIndex()  # Required to use coco.getAnnIds, etc.
+def convert_to_coco(dataset, output_dir, split_name, save_images=False, image_dir=None):
+    """Convert a dataset to COCO format and save it as JSON."""
+    os.makedirs(output_dir, exist_ok=True)
+    if save_images:
+        image_dir = image_dir or os.path.join(output_dir, "images", split_name)
+        os.makedirs(image_dir, exist_ok=True)
 
-    def __len__(self):
-        """Return the length of the dataset."""
-        return len(self.dataset)
+    images = []
+    annotations = []
+    categories = [{"id": 0, "name": TARGET}]
+    ann_id = 1  # global annotation ID counter
 
-    def build_coco_dict(self):
-        """Build full COCO dictionary from internal dataset."""
-        images = []
-        annotations = []
-        categories = set()
-        ann_id = 1
+    for idx, example in tqdm(
+        enumerate(dataset), total=len(dataset), desc=f"Processing {split_name}"
+    ):
+        image_id = example["image_id"]
+        width = example["width"]
+        height = example["height"]
+        file_name = f"{image_id}.jpg"
 
-        for item in self.dataset:
-            image_id = item["image_id"]
-            images.append(
+        if save_images:
+            image_path = os.path.join(image_dir, file_name)
+            example["image"].save(image_path)
+
+        images.append(
+            {
+                "id": image_id,
+                "file_name": file_name,
+                "width": width,
+                "height": height,
+            }
+        )
+
+        objects = example["objects"]
+        for i in range(len(objects["id"])):
+            annotations.append(
                 {
-                    "id": image_id,
-                    "width": item.get("width", 0),  # Replace with actual width
-                    "height": item.get("height", 0),  # Replace with actual height
-                    "file_name": item.get("file_name", f"{image_id}.jpg"),
+                    "id": ann_id,
+                    "image_id": image_id,
+                    "category_id": objects["category"][i],
+                    "bbox": objects["bbox"][i],
+                    "area": objects["area"][i],
+                    "iscrowd": 0,
                 }
             )
+            ann_id += 1
 
-            objs = item["objects"]
-            for i in range(len(objs["id"])):
-                annotations.append(
-                    {
-                        "id": ann_id,
-                        "image_id": image_id,
-                        "category_id": objs["category"][i],
-                        "bbox": objs["bbox"][i],
-                        "area": objs["area"][i],
-                        "iscrowd": 0,
-                    }
-                )
-                categories.add(objs["category"][i])
-                ann_id += 1
+    coco_dict = {
+        "images": images,
+        "annotations": annotations,
+        "categories": categories,
+        "info": {
+            "description": "Signature Dataset",
+            "version": "1.0",
+            "year": 2025,
+            "contributor": "",
+            "date_created": "",
+        },
+        "licenses": [{"id": 1, "name": "Apache 2.0", "url": ""}],
+    }
 
-        categories = [{"id": c, "name": str(c)} for c in sorted(categories)]
+    json_path = os.path.join(output_dir, f"{split_name}.json")
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(coco_dict, f)
 
-        return {
-            "images": images,
-            "annotations": annotations,
-            "categories": categories,
-            "info": {
-                "description": "Signature Dataset",
-                "version": "1.0",
-                "year": 2025,
-                "contributor": "",
-                "date_created": "",
-            },
-            "licenses": [{"id": 1, "name": "Unknown", "url": ""}],
-        }
 
-    def ensure_coco_format(self, annotations):
-        """Ensure the dataset is in COCO format."""
-        # initiating annotations in COCO format
-        coco_annotations = {"image_id": annotations["image_id"], "annotations": []}
+class SignatureDataset(torchvision.datasets.CocoDetection):
+    """Custom dataset class for signature detection."""
 
-        # iterating over annototed objects
-        for object_i in range(len(annotations["objects"]["id"])):
-            # getting the annotation for each object
-            annotation = {
-                "id": annotations["objects"]["id"][object_i],
-                "image_id": annotations["image_id"],
-                "category_id": annotations["objects"]["category"][object_i],
-                "bbox": annotations["objects"]["bbox"][object_i],
-                "area": annotations["objects"]["area"][object_i],
-                "iscrowd": 0,
-            }
-            coco_annotations["annotations"].append(annotation)
-
-        return coco_annotations
+    def __init__(self, img_folder, ann_file, image_processor):
+        """Initialize the SignatureDataset."""
+        super().__init__(img_folder, ann_file)
+        self.image_processor = image_processor
 
     def __getitem__(self, idx):
-        """Get an item from the dataset."""
-        # Get the item from the dataset
-        item = self.dataset[idx]
-        image = item["image"]
-        annotations = self.ensure_coco_format(item)
+        # read in PIL image and target in COCO format
+        images, annotations = super().__getitem__(idx)
 
-        # Process the image and annotations
-        encoding = self.processor(images=image, annotations=annotations, return_tensors="pt")
+        # preprocess image and target (converting target to DETR format, resizing +
+        # normalization of both image and target)
+        annotations = {"image_id": self.ids[idx], "annotations": annotations}
+        encoding = self.image_processor(images=images, annotations=annotations, return_tensors="pt")
+        pixel_values = encoding["pixel_values"].squeeze()  # remove batch dimension
+        target = encoding["labels"][0]  # remove batch dimension
 
-        # Remove batch dimension
-        pixel_values = encoding["pixel_values"][0].squeeze()
-        labels = encoding["labels"][0]
+        return pixel_values, target
 
-        return pixel_values, labels
-
-
-def get_collate_fn(processor):
-    """Get a custom collate function for the dataset."""
-
-    def collate_fn(batch):
-        """Custom collate function to handle batches of data."""
-        pixel_values = [item[0] for item in batch]
-        encoding = processor.pad(pixel_values, return_tensors="pt")
-        labels = [item[1] for item in batch]
-        batch = {}
-        batch["pixel_values"] = encoding["pixel_values"]
-        batch["labels"] = labels
-        return batch
-
-    return collate_fn
