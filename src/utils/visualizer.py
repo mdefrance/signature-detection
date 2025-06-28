@@ -1,5 +1,4 @@
 import numpy as np
-
 from PIL import Image, ImageDraw
 
 
@@ -57,10 +56,6 @@ def visualize_item(item):
 def _visualize_pred(image, predictions):
     """
     Display an image with bounding boxes drawn from the predictions.
-
-    Args:
-        image (PIL.Image): The input image.
-        predictions (list): A list of dictionaries containing the bounding box coordinates and other details.
     """
     # Create a draw object
     draw = ImageDraw.Draw(image)

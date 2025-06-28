@@ -2,12 +2,12 @@
 for signature detection.
 """
 
-import torchvision
-
-
-import os
 import json
+import os
+
+import torchvision
 from tqdm import tqdm
+
 from .config import TARGET
 
 
@@ -97,4 +97,3 @@ class SignatureDataset(torchvision.datasets.CocoDetection):
         target = encoding["labels"][0]  # remove batch dimension
 
         return pixel_values, target
-
