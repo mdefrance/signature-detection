@@ -52,3 +52,34 @@ def visualize_item(item):
     image = convert_tensor_to_pil_image(item[0])
 
     return add_label_bbox(item[1]["boxes"], image)
+
+
+def visualize_prediction(image, predictions):
+    """
+    Display an image with bounding boxes drawn from the predictions.
+
+    Args:
+        image (PIL.Image): The input image.
+        predictions (list): A list of dictionaries containing the bounding box coordinates and other details.
+    """
+    # Create a draw object
+    draw = ImageDraw.Draw(image)
+
+    # Draw each bounding box
+    for prediction in predictions:
+        box = prediction['box']
+        xmin = box['xmin']
+        ymin = box['ymin']
+        xmax = box['xmax']
+        ymax = box['ymax']
+        label = prediction['label']
+        score = prediction['score']
+
+        # Draw the bounding box
+        draw.rectangle([xmin, ymin, xmax, ymax], outline="blue", width=2)
+
+        # Optionally, add a label and score
+        label_text = f"{label}: {score:.2f}"
+        draw.text((xmin, ymin), label_text, fill="blue")
+
+    return image
