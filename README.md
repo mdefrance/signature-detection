@@ -35,7 +35,7 @@ prediction = yolos(image)
 ## Performances
 
 
-| **Metric**                      | [yolos-base-signature-detection](https://huggingface.co/mdefrance/yolos-base-signature-detection) | [yolos-base-signature-detection](https://huggingface.co/mdefrance/yolos-base-signature-detection) | [yolos-base-signature-detection](https://huggingface.co/mdefrance/yolos-base-signature-detection) | 
+| **Metric**                      | [yolos-base-signature-detection](https://huggingface.co/mdefrance/yolos-base-signature-detection) | [yolos-small-signature-detection](https://huggingface.co/mdefrance/yolos-small-signature-detection) | [yolos-tiny-signature-detection](https://huggingface.co/mdefrance/yolos-tiny-signature-detection) | 
 |:--------------------------------|------------:|-----------:|-----------------------------:|
 | **Inference Time - CPU (s)**    |    2.250    |      0.787 |                   **0.262**  |
 | **Inference Time - GPU (s)**    |     1.464   |      0.023 |                   **0.014**  |
