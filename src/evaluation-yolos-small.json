@@ -1,0 +1,9 @@
+{
+    "mAP50-95": 0.42126358426846783,
+    "mAP50": 0.8585663242047558,
+    "device": "cpu",
+    "batch_size": 1,
+    "inference_time_per_batch": 0.7871765583966968,
+    "inference_time": 0.7871765583966968,
+    "total_params": 30650118
+}

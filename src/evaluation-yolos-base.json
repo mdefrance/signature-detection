@@ -1,0 +1,9 @@
+{
+    "mAP50-95": 0.4950795743064662,
+    "mAP50": 0.8865014431398971,
+    "device": "cuda:0",
+    "batch_size": 1,
+    "inference_time_per_batch": 0.014635236849363778,
+    "inference_time": 0.014635236849363778,
+    "total_params": 127729158
+}

@@ -194,4 +194,3 @@ cython_debug/
 .cursorindexingignore
 */lightning_logs/*
 *.jpg
-*.json
