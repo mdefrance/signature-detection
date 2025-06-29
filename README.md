@@ -51,6 +51,7 @@ cd signature-detection
 2. Install dependencies with Poetry:
 
 ```bash
+pip install poetry==2.1.3
 poetry install
 ```
 
