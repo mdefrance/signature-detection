@@ -29,6 +29,7 @@ torchaudio = {version = "^2.6.0", source = "pytorch-gpu"}
 scipy = "^1.16.0"
 coco-eval = "^0.0.4"
 tensorboard = "^2.19.0"
+nb-clean = "^4.0.1"
 
 [[tool.poetry.source]]
 name = "pytorch-gpu"
