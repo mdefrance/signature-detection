@@ -1,3 +1,5 @@
+""" Module for fine-tuning YOLOS model for signature detection using PyTorch Lightning."""
+
 import pytorch_lightning as pl
 import torch
 
@@ -5,14 +7,13 @@ import torch
 class YolosForSignatureDetection(pl.LightningModule):
     """PyTorch Lightning module for YOLOS model fine-tuning on signature detection."""
 
-    def __init__(self, lr, weight_decay, model, train_dl, val_dl):
+    def __init__(self, lr, weight_decay, model):
         """Initialize the YOLOS model for signature detection fine-tuning."""
         super().__init__()
-        self.model = model
         self.lr = lr
         self.weight_decay = weight_decay
-        self.train_dl = train_dl
-        self.val_dl = val_dl
+        self.save_hyperparameters()
+        self.model = model
 
     def forward(self, pixel_values):
         """Forward pass through the model."""
@@ -59,11 +60,3 @@ class YolosForSignatureDetection(pl.LightningModule):
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
         return optimizer
-
-    def train_dataloader(self):
-        """Get the training dataloader."""
-        return self.train_dl
-
-    def val_dataloader(self):
-        """Get the validation dataloader."""
-        return self.val_dl
