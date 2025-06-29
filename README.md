@@ -31,7 +31,24 @@ prediction = yolos(image)
 
 ```
 
-## 🔧 Setup & Usage (Local)
+
+## Performances
+
+
+| **Metric**                      | [yolos-base-signature-detection](https://huggingface.co/mdefrance/yolos-base-signature-detection) | [yolos-base-signature-detection](https://huggingface.co/mdefrance/yolos-base-signature-detection) | [yolos-base-signature-detection](https://huggingface.co/mdefrance/yolos-base-signature-detection) | 
+|:--------------------------------|------------:|-----------:|-----------------------------:|
+| **Inference Time - CPU (s)**    |    2.250    |      0.787 |                   **0.262**  |
+| **Inference Time - GPU (s)**    |     1.464   |      0.023 |                   **0.014**  |
+| **Parameters**                  |   127.73M   |     30.65M |                        6.47M |
+| **mAP50**                       |   **0.887** |      0.859 |                        0.856 |
+| **mAP50-95**                    |   **0.495** |      0.421 |                        0.395 |
+
+Inference times are computed on a laptop with following specs:
+* CPU: Intel Core i7-9750H
+* GPU: NVIDIA GeForce GTX 1650
+
+
+## Setup & Usage (Local)
 
 ### Requirements
 
