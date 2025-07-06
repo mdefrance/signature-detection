@@ -30,6 +30,7 @@ scipy = "^1.16.0"
 coco-eval = "^0.0.4"
 tensorboard = "^2.19.0"
 nb-clean = "^4.0.1"
+gradio = "^5.35.0"
 
 [[tool.poetry.source]]
 name = "pytorch-gpu"
