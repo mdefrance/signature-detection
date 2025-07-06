@@ -193,5 +193,7 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 */lightning_logs/*
-*.jpg
+*/datasets/images/train/*
+*/datasets/images/test/*
+*/datasets/images/val/*
 test_img.png
